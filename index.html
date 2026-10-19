@@ -93,9 +93,8 @@
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-    // Bu iki satırı bir sonraki adımda Supabase'den aldığımız bilgilerle güncelleyeceğiz
-    const SUPABASE_URL = 'SENIN_SUPABASE_URL_ADRESIN'
-    const SUPABASE_ANON_KEY = 'SENIN_SUPABASE_ANON_KEY_DEGERIN'
+    const SUPABASE_URL = 'https://gokgkqdnjfrgboczohww.supabase.co'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdva2drcWRuamZyZ2JvY3pvaHd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0NDQ4NTIsImV4cCI6MjEwODAyMDg1Mn0.HG99lP807LIFcyd4PDe9N732738QTSSfmA5-MSlkMTw'
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     const treeContainer = document.getElementById('tree-container');

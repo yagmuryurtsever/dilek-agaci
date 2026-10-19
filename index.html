@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Dijital Dilek Ağacı 🌸</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f7f4;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    h1 { margin-bottom: 5px; color: #1b5e20; }
+    p { color: #555; }
+
+    #tree-container {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      height: 450px;
+      margin: 20px auto;
+      background: url('https://illustrations.pouch.cool/trees/tree-basic.svg') no-repeat center center;
+      background-size: contain;
+      border: 2px dashed #a8d5ba;
+      border-radius: 15px;
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .wish-note {
+      position: absolute;
+      padding: 6px 12px;
+      background-color: #ffb7b2;
+      color: #333;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+      white-space: nowrap;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .wish-note:hover {
+      transform: scale(1.25);
+      z-index: 10;
+    }
+
+    .input-box {
+      margin-top: 20px;
+    }
+    input[type="text"] {
+      padding: 10px 14px;
+      width: 260px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      font-size: 14px;
+    }
+    button {
+      padding: 10px 18px;
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      margin-left: 5px;
+    }
+    button:hover { background-color: #1b5e20; }
+  </style>
+</head>
+<body>
+
+  <h1>🌸 Dijital Dilek Ağacı 🌸</h1>
+  <p>Dileğini yaz, ortak ağacımıza as ve herkesle paylaş!</p>
+
+  <div id="tree-container">
+    <!-- Dilekler dinamik gelecek -->
+  </div>
+
+  <div class="input-box">
+    <input type="text" id="wishInput" placeholder="İçinden geçeni yaz (max 40 karakter)..." maxlength="40">
+    <button onclick="sendWish()">Ağaca As ✨</button>
+  </div>
+
+  <!-- Supabase Kütüphanesi -->
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    // Bu iki satırı bir sonraki adımda Supabase'den aldığımız bilgilerle güncelleyeceğiz
+    const SUPABASE_URL = 'SENIN_SUPABASE_URL_ADRESIN'
+    const SUPABASE_ANON_KEY = 'SENIN_SUPABASE_ANON_KEY_DEGERIN'
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    const treeContainer = document.getElementById('tree-container');
+    const colors = ['#ffb7b2', '#ffdac1', '#e2f0cb', '#b5ead7', '#c7ceea'];
+
+    // 1. Mevcut dilekleri yükle
+    async function fetchWishes() {
+      const { data, error } = await supabase.from('wishes').select('*');
+      if (error) {
+        console.error('Dilekler çekilemedi:', error);
+        return;
+      }
+      treeContainer.innerHTML = '';
+      data.forEach(wish => renderWish(wish));
+    }
+
+    // 2. Ekrana tek bir dilek çizme
+    function renderWish(wish) {
+      const note = document.createElement('div');
+      note.className = 'wish-note';
+      note.innerText = wish.text;
+      note.style.backgroundColor = wish.color || '#ffb7b2';
+      note.style.left = wish.pos_x + '%';
+      note.style.top = wish.pos_y + '%';
+      note.title = wish.text;
+      treeContainer.appendChild(note);
+    }
+
+    // 3. Yeni dilek gönderme
+    window.sendWish = async function() {
+      const input = document.getElementById('wishInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      const pos_x = Math.floor(Math.random() * 60) + 20;
+      const pos_y = Math.floor(Math.random() * 45) + 20;
+
+      const { error } = await supabase
+        .from('wishes')
+        .insert([{ text, color: randomColor, pos_x, pos_y }]);
+
+      if (error) {
+        alert('Dilek eklenirken hata oluştu!');
+        console.error(error);
+      } else {
+        input.value = '';
+      }
+    }
+
+    // 4. Canlı (Realtime) Dinleme
+    supabase
+      .channel('public:wishes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'wishes' }, payload => {
+        renderWish(payload.new);
+      })
+      .subscribe();
+
+    fetchWishes();
+  </script>
+</body>
+</html>

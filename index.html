@@ -121,8 +121,9 @@
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-    const SUPABASE_URL = 'https://gokgkqdnjfrgboczohww.supabase.co'
-    const SUPABASE_ANON_KEY = 'sb_publishable_GTc1OnAEiGHrHdLXS9bFSA_caZPW8Kb'
+    // Yeni Project ID'ye göre güncellenmiş URL ve bu projeye ait anon/public JWT anahtarınız
+    const SUPABASE_URL = 'https://ftdmhlvuiijiemkkoyil.supabase.co'
+    const SUPABASE_ANON_KEY = 'YENI_PROJEYE_AIT_UZUN_JWT_ANON_KEY'
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     const treeContainer = document.getElementById('tree-container');
